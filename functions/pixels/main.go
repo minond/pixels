@@ -13,6 +13,7 @@ import (
 )
 
 type Message struct {
+	Pixels [][]Pixel `json:"pixels"`
 	Path string `json:"path"`
 }
 
@@ -23,14 +24,13 @@ type Pixel struct {
 	A int
 }
 
-func Pixels(path string) {
+func openFileAndGetPixels(path string) ([][]Pixel, error) {
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
 	file, err := os.Open(path)
 
 	if err != nil {
-		fmt.Println("Unable to open %s", path)
-		panic(fmt.Sprintf("Unable to open %s", path))
+		return nil, err
 	}
 
 	defer file.Close()
@@ -38,11 +38,10 @@ func Pixels(path string) {
 	pixels, err := getPixels(file)
 
 	if err != nil {
-		fmt.Println("Unable to get pixels for %s", path)
-		panic(fmt.Sprintf("Unable to get pixels for %s", path))
+		return nil, err
 	}
 
-	fmt.Println(pixels)
+	return pixels, nil
 }
 
 // Many thanks to this SO post: https://goo.gl/CDW8Qq
@@ -87,7 +86,13 @@ func main() {
 			return nil, err
 		}
 
-		Pixels(m.Path)
+		pixels, err := openFileAndGetPixels(m.Path)
+
+		if err != nil {
+			return nil, err
+		}
+
+		m.Pixels = pixels
 
 		return m, nil
 	})
