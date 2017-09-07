@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/png"
 	"io"
-	"fmt"
 	"net/http"
 	"encoding/json"
 
@@ -71,10 +70,6 @@ func getPixels(file io.Reader) ([][]Pixel, error) {
 
 func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
 	return Pixel{int(r / 257), int(g / 257), int(b / 257), int(a / 257)}
-}
-
-func PixelsHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hi")
 }
 
 func main() {
