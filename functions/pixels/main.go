@@ -4,7 +4,6 @@ import (
 	"image"
 	"image/png"
 	"io"
-	"os"
 	"fmt"
 	"net/http"
 	"encoding/json"
@@ -24,18 +23,18 @@ type Pixel struct {
 	A int
 }
 
-func openFileAndGetPixels(path string) ([][]Pixel, error) {
+func getFileAndGetPixels(path string) ([][]Pixel, error) {
 	image.RegisterFormat("png", "png", png.Decode, png.DecodeConfig)
 
-	file, err := os.Open(path)
+	response, err := http.Get(path)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer file.Close()
+	defer response.Body.Close()
 
-	pixels, err := getPixels(file)
+	pixels, err := getPixels(response.Body)
 
 	if err != nil {
 		return nil, err
@@ -86,7 +85,7 @@ func main() {
 			return nil, err
 		}
 
-		pixels, err := openFileAndGetPixels(m.Path)
+		pixels, err := getFileAndGetPixels(m.Path)
 
 		if err != nil {
 			return nil, err
