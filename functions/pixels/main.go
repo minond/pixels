@@ -1,4 +1,4 @@
-package pixels
+package main
 
 import (
 	"image"
@@ -7,7 +7,14 @@ import (
 	"os"
 	"fmt"
 	"net/http"
+	"encoding/json"
+
+	"github.com/apex/go-apex"
 )
+
+type Message struct {
+	Path string `json:"path"`
+}
 
 type Pixel struct {
 	R int
@@ -70,4 +77,18 @@ func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
 
 func PixelsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "Hi")
+}
+
+func main() {
+	apex.HandleFunc(func(event json.RawMessage, ctx *apex.Context) (interface{}, error) {
+		var m Message
+
+		if err := json.Unmarshal(event, &m); err != nil {
+			return nil, err
+		}
+
+		Pixels(m.Path)
+
+		return m, nil
+	})
 }

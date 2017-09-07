@@ -1,0 +1,9 @@
+{
+  "name": "pixels",
+  "description": "get pixel data from an image",
+  "memory": 128,
+  "timeout": 5,
+  "role": "arn:aws:iam::985327697978:role/pixels_lambda_function",
+  "environment": {},
+  "runtime": "golang"
+}
