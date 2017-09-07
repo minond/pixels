@@ -1,18 +1,22 @@
 package main
 
 import (
+	"encoding/json"
 	"image"
 	"image/png"
 	"io"
 	"net/http"
-	"encoding/json"
 
 	"github.com/apex/go-apex"
 )
 
 type Message struct {
+	Body MessageBody `json:"body"`
+}
+
+type MessageBody struct {
 	Pixels [][]Pixel `json:"pixels"`
-	Path string `json:"path"`
+	Path   string    `json:"path"`
 }
 
 type Pixel struct {
@@ -69,7 +73,12 @@ func getPixels(file io.Reader) ([][]Pixel, error) {
 }
 
 func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
-	return Pixel{int(r / 257), int(g / 257), int(b / 257), int(a / 257)}
+	return Pixel{
+		int(r / 257),
+		int(g / 257),
+		int(b / 257),
+		int(a / 257),
+	}
 }
 
 func main() {
@@ -80,13 +89,13 @@ func main() {
 			return nil, err
 		}
 
-		pixels, err := getFileAndGetPixels(m.Path)
+		pixels, err := getFileAndGetPixels(m.Body.Path)
 
 		if err != nil {
 			return nil, err
 		}
 
-		m.Pixels = pixels
+		m.Body.Pixels = pixels
 
 		return m, nil
 	})

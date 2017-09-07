@@ -1,3 +1,5 @@
 {
-  "path": "http://minond.xyz/brainloller/brainloller/helloworld.png"
+  "body": {
+    "path": "http://minond.xyz/brainloller/brainloller/helloworld.png"
+  }
 }
