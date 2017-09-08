@@ -10,13 +10,19 @@ import (
 	"github.com/apex/go-apex"
 )
 
-type Message struct {
-	Body MessageBody `json:"body"`
+type IncomingMessage struct {
+	Path string `json:"path"`
 }
 
-type MessageBody struct {
+type OutgoingMessage struct {
+	IsBase64Encoded bool                `json:"isBase64Encoded"`
+	StatusCode      int                 `json:"statusCode"`
+	Headers         map[string]string   `json:"headers"`
+	Body            OutgoingMessageBody `json:"body"`
+}
+
+type OutgoingMessageBody struct {
 	Pixels [][]Pixel `json:"pixels"`
-	Path   string    `json:"path"`
 }
 
 type Pixel struct {
@@ -83,20 +89,23 @@ func rgbaToPixel(r uint32, g uint32, b uint32, a uint32) Pixel {
 
 func main() {
 	apex.HandleFunc(func(event json.RawMessage, ctx *apex.Context) (interface{}, error) {
-		var m Message
+		var req IncomingMessage
 
-		if err := json.Unmarshal(event, &m); err != nil {
+		if err := json.Unmarshal(event, &req); err != nil {
 			return nil, err
 		}
 
-		pixels, err := getFileAndGetPixels(m.Body.Path)
+		pixels, err := getFileAndGetPixels(req.Path)
 
 		if err != nil {
 			return nil, err
 		}
 
-		m.Body.Pixels = pixels
-
-		return m, nil
+		return OutgoingMessage{
+			false,
+			400,
+			make(map[string]string),
+			OutgoingMessageBody{pixels},
+		}, nil
 	})
 }
